@@ -1,0 +1,21 @@
+http:
+  routers:
+    react:
+      rule: "Host(`localhost`)"
+      entryPoints: ["web"]
+      service: frontend
+    django:
+      rule: "Host(`localhost`) && PathPrefix(`/api`)"
+      entryPoints: ["web"]
+      service: backend
+
+  services:
+    frontend:
+      loadBalancer:
+        servers:
+          - url: "http://frontend:3000"
+
+    backend:
+      loadBalancer:
+        servers:
+          - url: "http://backend:8000"

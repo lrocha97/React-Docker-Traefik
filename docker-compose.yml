@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: traefik:v2.11
+    command:
+      - "--api.insecure=true"
+      - "--providers.file.filename=/etc/traefik/dynamic.yml"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml
+      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml
+      - ./traefik/acme.json:/etc/traefik/acme.json
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  backend:
+    build: ./backend
+    container_name: backend
+    expose:
+      - "8000"
+    depends_on:
+      - traefik
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    expose:
+      - "3000"
+    depends_on:
+      - traefik
